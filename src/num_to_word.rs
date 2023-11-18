@@ -69,7 +69,7 @@ pub fn number_to_word(mut num: i32) -> Result<String, String> {
         if num >= deref_i {
             let div = num / deref_i;
             let rem = num % deref_i;
-            let subres = number_to_word(div).unwrap_or("".to_string());
+            let subres = handle_two_digit_numbers(div);
 
             result = format!(" {} {} {}", &result, subres, POWERS_OF_TEN.get(i).get_or_insert(&""));
 
@@ -77,23 +77,32 @@ pub fn number_to_word(mut num: i32) -> Result<String, String> {
         }
     }
 
+    result = format!("{} {}", &result, handle_two_digit_numbers(num));
+
+    Ok(String::from(result.trim()))
+}
+
+fn handle_two_digit_numbers(num: i32) -> String {
+    let mut result = "".to_string();
+
     if num > 10 && num < 20 {
-        result = format!(" {} {}", &result, ELEVEN_TO_NINETEEN.get(&num).get_or_insert(&""));
+        result = format!("{}", ELEVEN_TO_NINETEEN.get(&num).get_or_insert(&""));
     } else if num < 10 {
-        result = format!(" {} {}", &result, SINGLE_DIGITS.get(&num).get_or_insert(&""));
+        result = format!("{}", SINGLE_DIGITS.get(&num).get_or_insert(&""));
     } else if num < 100 {
         let tens = (num / 10) * 10;
         let ones = num % 10;
-        result = format!(" {} {} {}", &result, TEN_TO_NINETY.get(&tens).get_or_insert(&""), SINGLE_DIGITS.get(&ones).get_or_insert(&""));
+        result = format!("{} {}", TEN_TO_NINETY.get(&tens).get_or_insert(&""), SINGLE_DIGITS.get(&ones).get_or_insert(&""));
     }
 
-    Ok(String::from(result.trim()))
+    String::from(result.trim())
 }
 
 #[cfg(test)]
 mod tests {
     use rstest::rstest;
     use crate::number_to_word;
+
     #[rstest]
     #[case(5, "Five")]
     #[case(999_999_9, "Ninety Nine Lakh Ninety Nine Thousand Nine Hundred Ninety Nine")]
@@ -113,5 +122,11 @@ mod tests {
     #[should_panic(expected = "Only numbers less than 10000000 are supported")]
     fn test_panic_number_to_word() {
         number_to_word(1000_000_5).unwrap();
+    }
+
+    #[test]
+    fn dummy_test() {
+        let actual = number_to_word(2019);
+        assert_eq!(actual, Ok("Two Thousand Nineteen".to_string()));
     }
 }
