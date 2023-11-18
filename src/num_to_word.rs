@@ -97,12 +97,21 @@ pub fn number_to_word(mut num: i32) -> Result<String, String> {
 
 #[cfg(test)]
 mod tests {
+    use rstest::rstest;
     use crate::number_to_word;
-    #[test]
-    fn test_number_to_word() {
+    #[rstest]
+    #[case(5, "Five")]
+    #[case(999_999_9, "Ninety Nine Lakh Ninety Nine Thousand Nine Hundred Ninety Nine")]
+    #[case(51_48_649, "Fifty One Lakh Forty Eight Thousand Six Hundred Forty Nine")]
+    #[case(134597, "One Lakh Thirty Four Thousand Five Hundred Ninety Seven")]
+    #[case(10001, "Ten Thousand One")]
+    #[case(2019, "Two Thousand Nineteen")]
+    #[case(999, "Nine Hundred Ninety Nine")]
+    fn test_number_to_word(#[case] num: i32,
+    #[case] expected: String) {
 
-        let actual = number_to_word(5);
-        assert_eq!(actual, Ok("Five".to_string()));
+        let actual = number_to_word(num);
+        assert_eq!(actual, Ok(expected));
 
         // let actual = number_to_word(9999999);
         // assert_eq!(actual, Ok("Ninety Nine Lakh Ninety Nine Thousand Nine Hundred Ninety Nine".to_string()));
