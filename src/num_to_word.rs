@@ -45,11 +45,8 @@ static ref TEN_TO_NINETY: HashMap<i32, &'static str> = HashMap::from([
 static ref POWERS_OF_TEN: HashMap<i32, &'static str> = HashMap::from([
     (100, "Hundred"),
     (1000, "Thousand"),
-    // (10_000, "Ten Thousand".to_string()),
     (100_000, "Lakh"),
-    // (1000_000, "Ten Lakh".to_string()),
     (10_000_000, "Crore"),
-
 ]);
 
 static ref POWERS_OF_TEN_LIST: Vec<i32> = vec![
@@ -59,7 +56,7 @@ static ref POWERS_OF_TEN_LIST: Vec<i32> = vec![
 
 pub fn number_to_word(mut num: i32) -> Result<String, String> {
     if num > *POWERS_OF_TEN_LIST.first().unwrap() {
-        return Err(format!("Only numbers less than {} are supported", POWERS_OF_TEN_LIST.last().unwrap()));
+        return Err(format!("Only numbers less than {} are supported", POWERS_OF_TEN_LIST.first().unwrap()));
     }
 
     let mut result = "".to_string();
@@ -92,7 +89,6 @@ pub fn number_to_word(mut num: i32) -> Result<String, String> {
     }
 
     Ok(String::from(result.trim()))
-
 }
 
 #[cfg(test)]
@@ -127,5 +123,11 @@ mod tests {
         // let actual = number_to_word(2019);
         //
         // assert_eq!(actual, Ok("Two Thousand Nineteen".to_string()))
+    }
+
+    #[test]
+    #[should_panic(expected = "Only numbers less than 10000000 are supported")]
+    fn test_panic_number_to_word() {
+        number_to_word(1000_000_5).unwrap();
     }
 }
