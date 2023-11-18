@@ -1,3 +1,4 @@
+
 use std::collections::HashMap;
 use lazy_static::lazy_static;
 
@@ -56,7 +57,7 @@ static ref POWERS_OF_TEN_LIST: Vec<i32> = vec![
 ];
 }
 
-fn number_to_word(mut num: i32) -> Result<String, String> {
+pub fn number_to_word(mut num: i32) -> Result<String, String> {
     if num > *POWERS_OF_TEN_LIST.first().unwrap() {
         return Err(format!("Only numbers less than {} are supported", POWERS_OF_TEN_LIST.last().unwrap()));
     }
@@ -119,5 +120,3 @@ mod tests {
         // assert_eq!(actual, Ok("Two Thousand Nineteen".to_string()))
     }
 }
-
-fn main() {}
