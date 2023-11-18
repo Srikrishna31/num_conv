@@ -50,9 +50,11 @@ static ref POWERS_OF_TEN: HashMap<i32, &'static str> = HashMap::from([
 ]);
 
 static ref POWERS_OF_TEN_LIST: Vec<i32> = vec![
-    10_000_000, 100_000, 1000, 100, 10, 1
+    10_000_000, 100_000, 1000, 100
 ];
 }
+
+const MAX_SUPPORTED_NUM: i32 = 10_000_000;
 
 pub fn number_to_word(mut num: i32) -> Result<String, String> {
     if num > *POWERS_OF_TEN_LIST.first().unwrap() {
@@ -61,31 +63,28 @@ pub fn number_to_word(mut num: i32) -> Result<String, String> {
 
     let mut result = "".to_string();
 
-    //POWERS_OF_TEN_LIST.iter().rev().fold("", )
+    //POWERS_OF_TEN_LIST.iter().rev().fold("", )'
     for i in POWERS_OF_TEN_LIST.iter() {
         let deref_i = *i;
         if num >= deref_i {
-            if num > 10 && num < 20 {
-                result = format!(" {} {}", &result, ELEVEN_TO_NINETEEN.get(&num).get_or_insert(&""));
-                break;
-            } else if num < 10 {
-                result = format!(" {} {}", &result, SINGLE_DIGITS.get(&num).get_or_insert(&""));
-                break;
-            } else if num < 100 {
-                let tens = (num / 10) * 10;
-                let ones = num % 10;
-                result = format!(" {} {} {}", &result, TEN_TO_NINETY.get(&tens).get_or_insert(&""), SINGLE_DIGITS.get(&ones).get_or_insert(&""));
-                break;
-            } else {
-                let div = num / deref_i;
-                let rem = num % deref_i;
-                let subres = number_to_word(div).unwrap_or("".to_string());
+            let div = num / deref_i;
+            let rem = num % deref_i;
+            let subres = number_to_word(div).unwrap_or("".to_string());
 
-                result = format!(" {} {} {}", &result, subres, POWERS_OF_TEN.get(i).get_or_insert(&""));
+            result = format!(" {} {} {}", &result, subres, POWERS_OF_TEN.get(i).get_or_insert(&""));
 
-                num = rem;
-            }
+            num = rem;
         }
+    }
+
+    if num > 10 && num < 20 {
+        result = format!(" {} {}", &result, ELEVEN_TO_NINETEEN.get(&num).get_or_insert(&""));
+    } else if num < 10 {
+        result = format!(" {} {}", &result, SINGLE_DIGITS.get(&num).get_or_insert(&""));
+    } else if num < 100 {
+        let tens = (num / 10) * 10;
+        let ones = num % 10;
+        result = format!(" {} {} {}", &result, TEN_TO_NINETY.get(&tens).get_or_insert(&""), SINGLE_DIGITS.get(&ones).get_or_insert(&""));
     }
 
     Ok(String::from(result.trim()))
@@ -108,21 +107,6 @@ mod tests {
 
         let actual = number_to_word(num);
         assert_eq!(actual, Ok(expected));
-
-        // let actual = number_to_word(9999999);
-        // assert_eq!(actual, Ok("Ninety Nine Lakh Ninety Nine Thousand Nine Hundred Ninety Nine".to_string()));
-
-        // let actual = number_to_word(5148649);
-        // assert_eq!(actual, Ok("Fifty One Lakh Forty Eight Thousand Six Hundred Forty Nine".to_string()));
-
-        // let actual = number_to_word(134597);
-        // assert_eq!(actual, Ok("One Lakh Thirty Four Thousand Five Hundred Ninety Seven".to_string()))
-        // let actual = number_to_word(10001);
-        //
-        // assert_eq!(actual, Ok("Ten Thousand One".to_string()));
-        // let actual = number_to_word(2019);
-        //
-        // assert_eq!(actual, Ok("Two Thousand Nineteen".to_string()))
     }
 
     #[test]
