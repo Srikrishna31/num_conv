@@ -51,25 +51,27 @@ lazy_static! {
 
 pub fn word_to_number(word: String) -> Result<i32, String> {
 
-    Ok(word.split(" ").fold(0, |acc, val|{
+    let res = word.split(" ").fold((0,0), |(acc, sub_acc), val|{
         let mut res = 0;
         if SINGLE_DIGITS.contains_key(val) {
             res = *SINGLE_DIGITS.get(val).unwrap();
-            acc + res
+            (acc, sub_acc + res)
         }
         else if ELEVEN_TO_NINETEEN.contains_key(val) {
             res = *ELEVEN_TO_NINETEEN.get(val).unwrap();
-            acc + res
+            (acc, sub_acc + res)
         } else if TEN_TO_NINETY.contains_key(val) {
             res = *TEN_TO_NINETY.get(val).unwrap();
-            acc + res
+            (acc, sub_acc + res)
         } else if POWERS_OF_TEN.contains_key(val) {
             res = *POWERS_OF_TEN.get(val).unwrap();
-            acc * res
+            (acc + sub_acc * res, 0)
         } else {
-            acc
+            (acc, sub_acc)
         }
-    }))
+    });
+
+    Ok(res.0 + res.1)
 }
 
 #[cfg(test)]
