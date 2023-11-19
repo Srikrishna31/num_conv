@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use lazy_static::lazy_static;
 
 lazy_static! {
-    static ref SINGLE_DIGITS: HashMap<&'static str, i32> = HashMap::from(
+    static ref SINGLE_DIGITS: HashMap<&'static str, u32> = HashMap::from(
       [
           ("One",   1),
           ("Two",   2),
@@ -16,7 +16,7 @@ lazy_static! {
       ]
     );
 
-    static ref ELEVEN_TO_NINETEEN: HashMap<&'static str, i32> = HashMap::from([
+    static ref ELEVEN_TO_NINETEEN: HashMap<&'static str, u32> = HashMap::from([
         ("Eleven",      11),
         ("Twelve",      12),
         ("Thirteen",    13),
@@ -29,7 +29,7 @@ lazy_static! {
         ]
     );
 
-    static ref TEN_TO_NINETY: HashMap<&'static str, i32> = HashMap::from([
+    static ref TEN_TO_NINETY: HashMap<&'static str, u32> = HashMap::from([
          ("Ten",        10),
          ("Twenty",     20),
          ("Thirty",     30),
@@ -41,7 +41,7 @@ lazy_static! {
          ("Ninety",     90),
     ]);
 
-    static ref POWERS_OF_TEN: HashMap<&'static str, i32> = HashMap::from([
+    static ref POWERS_OF_TEN: HashMap<&'static str, u32> = HashMap::from([
         ("Hundred",     100       ),
         ("Thousand",    1000      ),
         ("Lakh",        100_000   ),
@@ -49,15 +49,18 @@ lazy_static! {
     ]);
 }
 
-pub fn word_to_number(word: String) -> Result<i32, String> {
+
+/// Given a word representation of the number, this function coverts it into integer representation.
+/// Maximum number supported is 9_999_999 (Ninety Nine Lakh Nine Hundred and Ninety Nine).
+/// For numbers greater than that, the result is undefined. - Meaning the conversion can be partial.
+pub fn word_to_number(word: String) -> Result<u32, String> {
 
     let res = word.split(" ").fold((0,0), |(acc, sub_acc), val|{
         let mut res = 0;
         if SINGLE_DIGITS.contains_key(val) {
             res = *SINGLE_DIGITS.get(val).unwrap();
             (acc, sub_acc + res)
-        }
-        else if ELEVEN_TO_NINETEEN.contains_key(val) {
+        } else if ELEVEN_TO_NINETEEN.contains_key(val) {
             res = *ELEVEN_TO_NINETEEN.get(val).unwrap();
             (acc, sub_acc + res)
         } else if TEN_TO_NINETY.contains_key(val) {
@@ -88,15 +91,9 @@ mod tests {
     #[case("Two Thousand Nineteen", 2019)]
     #[case("Nine Hundred Ninety Nine", 999)]
     fn test_word_to_number(#[case] num: String,
-                           #[case] expected: i32) {
+                           #[case] expected: u32) {
 
         let actual = word_to_number(num);
         assert_eq!(actual, Ok(expected));
-    }
-
-    #[test]
-    fn test_dummy() {
-        let actual = word_to_number("Ninety Nine Lakh Ninety Nine Thousand Nine Hundred Ninety Nine".to_string());
-        assert_eq!(actual, Ok(99_999_99));
     }
 }

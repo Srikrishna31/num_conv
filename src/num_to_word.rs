@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use lazy_static::lazy_static;
 
 lazy_static! {
-static ref SINGLE_DIGITS: HashMap<i32, &'static str> = HashMap::from(
+static ref SINGLE_DIGITS: HashMap<u32, &'static str> = HashMap::from(
   [
       (1, "One"),
       (2, "Two"),
@@ -17,7 +17,7 @@ static ref SINGLE_DIGITS: HashMap<i32, &'static str> = HashMap::from(
   ]
 );
 
-static ref ELEVEN_TO_NINETEEN: HashMap<i32, &'static str> = HashMap::from([
+static ref ELEVEN_TO_NINETEEN: HashMap<u32, &'static str> = HashMap::from([
     (11, "Eleven"),
     (12, "Twelve"),
     (13, "Thirteen"),
@@ -30,7 +30,7 @@ static ref ELEVEN_TO_NINETEEN: HashMap<i32, &'static str> = HashMap::from([
     ]
 );
 
-static ref TEN_TO_NINETY: HashMap<i32, &'static str> = HashMap::from([
+static ref TEN_TO_NINETY: HashMap<u32, &'static str> = HashMap::from([
      (10, "Ten"),
      (20, "Twenty"),
      (30, "Thirty"),
@@ -42,21 +42,23 @@ static ref TEN_TO_NINETY: HashMap<i32, &'static str> = HashMap::from([
      (90, "Ninety"),
 ]);
 
-static ref POWERS_OF_TEN: HashMap<i32, &'static str> = HashMap::from([
+static ref POWERS_OF_TEN: HashMap<u32, &'static str> = HashMap::from([
     (100, "Hundred"),
     (1000, "Thousand"),
     (100_000, "Lakh"),
     (10_000_000, "Crore"),
 ]);
 
-static ref POWERS_OF_TEN_LIST: Vec<i32> = vec![
+static ref POWERS_OF_TEN_LIST: Vec<u32> = vec![
     10_000_000, 100_000, 1000, 100
 ];
 }
 
-const MAX_SUPPORTED_NUM: i32 = 10_000_000;
-
-pub fn number_to_word(mut num: i32) -> Result<String, String> {
+/// Given a positive integer, return the word representation of the number.
+/// For numbers greater than 99999, this function uses Lakhs (Indian word for Hundred Thousand).
+/// Maximum number supported is 9_999_999 (Ninety Nine Lakh Nine Hundred and Ninety Nine).
+/// If the input is greater than this, then the function returns an Error string.
+pub fn number_to_word(mut num: u32) -> Result<String, String> {
     if num > *POWERS_OF_TEN_LIST.first().unwrap() {
         return Err(format!("Only numbers less than {} are supported", POWERS_OF_TEN_LIST.first().unwrap()));
     }
@@ -80,7 +82,7 @@ pub fn number_to_word(mut num: i32) -> Result<String, String> {
     Ok(String::from(format!("{} {}", &result, handle_two_digit_numbers(num)).trim()))
 }
 
-fn handle_two_digit_numbers(num: i32) -> String {
+fn handle_two_digit_numbers(num: u32) -> String {
     let mut result = "".to_string();
 
     if num > 10 && num < 20 {
@@ -109,7 +111,7 @@ mod tests {
     #[case(10001, "Ten Thousand One")]
     #[case(2019, "Two Thousand Nineteen")]
     #[case(999, "Nine Hundred Ninety Nine")]
-    fn test_number_to_word(#[case] num: i32,
+    fn test_number_to_word(#[case] num: u32,
     #[case] expected: String) {
 
         let actual = number_to_word(num);
