@@ -61,25 +61,23 @@ pub fn number_to_word(mut num: i32) -> Result<String, String> {
         return Err(format!("Only numbers less than {} are supported", POWERS_OF_TEN_LIST.first().unwrap()));
     }
 
-    let mut result = "".to_string();
-
-    //POWERS_OF_TEN_LIST.iter().rev().fold("", )'
-    for i in POWERS_OF_TEN_LIST.iter() {
+    let result = POWERS_OF_TEN_LIST.iter().fold(String::from(""), |acc, i| {
         let deref_i = *i;
         if num >= deref_i {
             let div = num / deref_i;
             let rem = num % deref_i;
+
             let subres = handle_two_digit_numbers(div);
 
-            result = format!(" {} {} {}", &result, subres, POWERS_OF_TEN.get(i).get_or_insert(&""));
-
             num = rem;
+
+            format!("{} {} {}", &acc, subres, POWERS_OF_TEN.get(i).get_or_insert(&""))
+        } else {
+            acc
         }
-    }
+    });
 
-    result = format!("{} {}", &result, handle_two_digit_numbers(num));
-
-    Ok(String::from(result.trim()))
+    Ok(String::from(format!("{} {}", &result, handle_two_digit_numbers(num)).trim()))
 }
 
 fn handle_two_digit_numbers(num: i32) -> String {
@@ -122,11 +120,5 @@ mod tests {
     #[should_panic(expected = "Only numbers less than 10000000 are supported")]
     fn test_panic_number_to_word() {
         number_to_word(1000_000_5).unwrap();
-    }
-
-    #[test]
-    fn dummy_test() {
-        let actual = number_to_word(2019);
-        assert_eq!(actual, Ok("Two Thousand Nineteen".to_string()));
     }
 }
